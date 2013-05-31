@@ -24,6 +24,7 @@ public abstract class SimSystem  {
 
 	
 	public SimSystem() { 
+		nodesTable = new ArrayList<Node>();
 		setupSimulator(); 
 	}
 
@@ -31,6 +32,8 @@ public abstract class SimSystem  {
 	protected abstract void setupProtocol(
 			ArrayList<ArrayList<Integer> > rrGraph,
 			ArrayList<ArrayList<Integer> > rtGraph);
+
+	
 
 
 	protected void setInitiator(int i) {

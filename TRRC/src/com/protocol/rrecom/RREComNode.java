@@ -4,8 +4,13 @@ package com.protocol.rrecom;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.my.util.MyUtil;
+import com.protocol.Neighbor;
 import com.protocol.Node;
 import com.protocol.Tag;
 import com.simulator.Message;
@@ -33,6 +38,8 @@ public class RREComNode extends Node {
 	
 	public RREComNode(SimSystem sim, int id, RREGlobalStruct g) {
 		super(sim, id);
+		
+		this.status = RREComNode.STAT_INIT; 
 		this.globalViewer = g;
 	}
 
@@ -52,14 +59,19 @@ public class RREComNode extends Node {
 
 		changeStatus(RREComNode.STAT_EX_TX); 
 		
-		for (int i = 0; i < neighborsNodes.size(); i++) { 
-			if (neighborsNodes.get(i).active) { 
-
-				RREComMessageContent mc = prepareMessage(round);
-				Message msg = new Message(this.id, neighborsNodes.get(i).id, RREComNode.MSG_EX, mc);
-				sendMessage(msg);
-				
-			}
+		
+		Iterator<Entry<Integer, Neighbor>> it = neighborsNodes.entrySet().iterator();
+		while (it.hasNext()) {
+				Entry<Integer, Neighbor> pairs = it.next();
+	        
+				Neighbor n = pairs.getValue(); 
+		        if (n.active) { 
+		        	
+					RREComMessageContent mc = prepareMessage(round);
+					Message msg = new Message(this.id, n.id, RREComNode.MSG_EX, mc);
+					sendMessage(msg);
+		        }
+		        
 		}
 		
 		
@@ -91,7 +103,7 @@ public class RREComNode extends Node {
 		if (status == RREComNode.STAT_INIT) { 
 			handleStatusInit(message);
 			
-		} if (status == RREComNode.STAT_EX_RX) { 
+		} else if (status == RREComNode.STAT_EX_RX) { 
 			handleStatusExRx(message);
 		
 		} else { 
@@ -214,7 +226,7 @@ public class RREComNode extends Node {
 			if (sharedTags.size() > 0) { 
 				
 				if (D) { 
-					log.printf("node %d share %d tags with node %d",
+					log.printf("node %d share %d tags with node %d \n",
 							this.id, sharedTags.size(), sender);
 				}
 				
@@ -288,7 +300,9 @@ public class RREComNode extends Node {
 	@Override
 	public boolean isValidStatus(String str) {
 		return (str == RREComNode.STAT_INIT || 
-				str == RREComNode.STAT_TERMINATE); 
+				str == RREComNode.STAT_TERMINATE || 
+				str == RREComNode.STAT_EX_RX || 
+				str == RREComNode.STAT_EX_TX); 
 	}
 
 	@Override

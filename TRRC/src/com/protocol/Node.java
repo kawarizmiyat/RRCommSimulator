@@ -145,8 +145,13 @@ public abstract class Node {
 	// I dont like these two functions. 
 	public void addNodeNeighbor(int i) {
 		
+		System.out.printf("node %d is adding neighbor %d \n", this.id, i);
+		
 		neighborsNodes.put(i, new Neighbor(i));
 		numNeighborReaders ++;
+		
+		
+		
 	}
 
 	public void addTagNeighbor(int i) { 

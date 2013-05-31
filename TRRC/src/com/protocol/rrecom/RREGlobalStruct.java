@@ -13,10 +13,17 @@ public class RREGlobalStruct {
 		// value without a null pointer excpetion.
 		
 		neighborsTagsTable = new ArrayList<ArrayList<Integer> > ();
+		nodesGraph = new RREGraphEntity[numNodes][numNodes];
+		
 		for (int i = 0; i < numNodes; i++) { 
-			nodesGraph[i] = new RREGraphEntity[numNodes];
+			
 			neighborsTagsTable.add(new ArrayList<Integer>());
+			
+			for (int j = 0; j < numNodes; j++) { 
+				nodesGraph[i][j] = new RREGraphEntity();
+			}
 		}
+		
 		
 	}
 
