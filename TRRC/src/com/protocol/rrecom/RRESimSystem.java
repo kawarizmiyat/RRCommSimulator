@@ -2,6 +2,7 @@ package com.protocol.rrecom;
 
 import java.util.ArrayList;
 
+import com.protocol.Node;
 import com.simulator.SimSystem;
 
 public class RRESimSystem extends SimSystem {
@@ -24,25 +25,6 @@ public class RRESimSystem extends SimSystem {
 		setupProtocol(rrGraph, rtGraph);
 	}
 	
-//	public void setRTGraph(String algorithm, ArrayList<ArrayList<Integer>> rtGraph) {
-//
-//
-//		int numReaders = rtGraph.size();
-//		initiateReaders(numReaders, algorithm);
-//
-//		for (int i = 0; i < g.size(); i++) { 
-//
-//			for (int j = 0; j < g.get(i).size(); j++) { 
-//				nodesTable.get(i).addNodeNeighbor(rtGraph.get(i).get(j));
-//			}
-//
-//		}
-//		
-//		for (int i = 0; i < nodesTable.size(); i ++ ) { 
-//			setInitiator(i);
-//		}
-//
-//	}
 	
 	@Override
 	protected void setupProtocol(ArrayList<ArrayList<Integer>> rrGraph,
@@ -97,7 +79,26 @@ public class RRESimSystem extends SimSystem {
 		// every node is an initiator. 
 		for (int i = 0; i < this.rrGraph.size(); i++) { 
 			this.setInitiator(i);
-		}		
+		}	
+		
+		// Note: you can specify only the nodes that you want.
+	}
+
+	@Override
+	protected void analyzeResults() {
+		Node n;
+		for (int i = 0; i < nodesTable.size(); i++) { 
+			
+			n = nodesTable.get(i);
+			
+			if (! nodesTable.get(i).redundant) { 
+				log.printf("node %d is not redundant: it owns (", nodesTable.get(i).id);
+				for (int j = 0; j < n.ownedTags.size(); j++)  {
+					log.printf("%d ", n.ownedTags.get(j));
+				}
+				log.printf("); \n");
+			}
+		}
 	}
 
 }

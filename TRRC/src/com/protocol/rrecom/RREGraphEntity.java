@@ -2,9 +2,9 @@ package com.protocol.rrecom;
 
 public class RREGraphEntity {
 
-	public boolean linkVisited;
-	public boolean shareTag;
-	public boolean edge; 
+	public boolean linkVisited = false;
+	public boolean shareTag = false;
+	public boolean edge = false; 
 	
 	public RREGraphEntity() { 
 		linkVisited = false;

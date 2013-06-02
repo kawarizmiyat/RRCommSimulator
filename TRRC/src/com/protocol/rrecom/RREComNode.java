@@ -57,9 +57,18 @@ public class RREComNode extends Node {
 
 	private void startRound() {
 
+		
+		if (D) { 
+			log.printf("node %d starting a round \n", this.id);
+		}
+		
+		
+		// start the sending part of the communication round.
 		changeStatus(RREComNode.STAT_EX_TX); 
 		
 		
+		// iterate over all your neighbros - and send a message msg_ex. 
+		// no content. they know what to do. (this is just for simulation of course).
 		Iterator<Entry<Integer, Neighbor>> it = neighborsNodes.entrySet().iterator();
 		while (it.hasNext()) {
 				Entry<Integer, Neighbor> pairs = it.next();
@@ -69,12 +78,17 @@ public class RREComNode extends Node {
 		        	
 					RREComMessageContent mc = prepareMessage(round);
 					Message msg = new Message(this.id, n.id, RREComNode.MSG_EX, mc);
+					
 					sendMessage(msg);
+					
+					if (D) { 
+						log.printf("node %d sending a message to %d \n", this.id, n.id);
+					}
 		        }
 		        
 		}
 		
-		
+		// start at the receiving part of the communication round.
 		changeStatus(RREComNode.STAT_EX_RX);
 
 		
@@ -108,6 +122,9 @@ public class RREComNode extends Node {
 		
 		} else { 
 			
+			log.printf("error: node %d received message from %d at status %s \n", 
+					this.id, message.senderId, status);
+			
 			log.printf("error at node %d. status %s is not recognized \n", this.id, status);
 			abort();
 		}
@@ -120,11 +137,24 @@ public class RREComNode extends Node {
 		
 		if (message.msgType == RREComNode.MSG_EX) { 
 			
+			if (D) { 
+				log.printf("node %d received message MSG_EX at status %s \n", this.id, status);
+			}
+			
+			
 			RREComMessageContent rmc =  (RREComMessageContent) message.msgContent; 
 
+
 			if (rmc.type == RREComNode.MSG_TYPE_EX_0) { 
+				
+				if (D) { 
+					log.printf("node %d received msg_type_ex 0 ... \n", this.id);
+				}
+				
+				// direct the edge (myself, sender)
 				directEdge(message);
 				
+				// test if all visited - to terminate the communication round.
 				if (allVisited(rmc.type)) { 
 					makeRedundancyDecision(); 
 					terminate();
@@ -145,36 +175,62 @@ public class RREComNode extends Node {
 		
 	}
 
-	private void terminate() {
-		changeStatus(RREComNode.STAT_TERMINATE);
-	}
 
 	private void makeRedundancyDecision() {
 		
+		if (D) { 
+			log.printf("node %d checks whether it is redundant or not. \n", this.id);
+		}
 		
-		// used for more detailed debugginh
-		boolean innerD = true;
-		
-		for (int i = 0; i < neighborsTags.size(); i++) { 
-			if (neighborsTags.get(i).owner == Tag.ME) {
-				
-				if (D && innerD)  { 
-					log.printf("node %d owns tag %d \n", 
-							this.id, neighborsTags.get(i).id);
+		// check which tags you own. This can be taken only after the communication round 
+		// is over.
+		// iterate over a hash table.
+		Tag t; 
+		Iterator<Entry<Integer, Tag>> it = neighborsTags.entrySet().iterator();
+		while (it.hasNext()) {
+				Entry<Integer, Tag> pairs = it.next();
+	        
+				t = pairs.getValue(); 
+				if (t.owner == Tag.ME) {
+					
+					if (D) { 
+						log.printf("node %d owns tag %d. reasong: Tag.ME \n", this.id, t.id);
+					}
+					
+					ownTag(t.id);
 				}
 				
-				this.ownTag(neighborsTags.get(i).id);
+				// a special case: if the owner of this tag is "not init", then 
+				// this tag is owned by me. 
+				// why ? because I am sure that I have visited all my neighbors. 
+				// if I've shared t with any other, its owner would have been changed. 
+				// therefore, t is a neighbor to me only !
+				// Note: according to our assumption that tc > 2 x ts, if two nodes 
+				// share a tag than thy can communicate with each other. 
+				// However, this assumption does not say that all my tags are covered by 
+				// my neighbor readers. 
+				if (t.owner == Tag.NOT_INIT) { 
 
-			}
-
+					if (D) { 
+						log.printf("node %d owns tag %d. reasong: Tag.NON_INIT \n", this.id, t.id);
+					}
+					
+					ownTag(t.id);
+				}
+				
+		        
 		}
+		
 
+		// check whether you are redundant or not.
 		if (this.ownedTags.size() > 0) { 
 			if (D) { 
 				log.printf("node %d is found non-redundant \n", this.id);
 			}
-		} else { 
+			
 			this.redundant = false;
+		} else { 
+			this.redundant = true;
 		}
 
 	}
@@ -188,18 +244,35 @@ public class RREComNode extends Node {
 			RREGraphEntity[] t = globalViewer.nodesGraph[this.id];
 		
 			for (int i = 0; i < t.length; i++) { 
-				if (t[i].linkVisited == false) { 
+				
+				if (D) { 
+					if (t[i].edge) { 
+						log.printf("node %d at all visited checking neighbor %d (linkvisited: " + 
+								t[i].linkVisited + ")\n", 
+								this.id, i);
+					}
+				}
+				
+				if ((t[i].edge) && (!t[i].linkVisited)) {
+					
+					if (D) { 
+						log.printf("at node %d: neighbor is not visited. \n", this.id, i);
+					}
 					return false;
 				}
 			}
 
 			// i.e. all neighbors are visisted. 
+			if (D) { 
+				log.printf("node %d visited all its nodes \n", this.id);
+			}
 			return true;
 
 		} else { 
 			log.printf("error at node %d allVisisted does not decide \n",
 					this.id);
 			abort();
+			
 			return false;
 		}
 		
@@ -207,37 +280,56 @@ public class RREComNode extends Node {
 
 	private void directEdge(Message message) {
 		
+		
+		
 		int sender = message.senderId;
 		int senderWeight = ((RREComMessageContent) message.msgContent).weight;
 		RREComValue sw = new RREComValue(senderWeight, sender);
 		
 		
-		if (! globalViewer.nodesGraph[this.id][sender].linkVisited) { 
-		
-			globalViewer.nodesGraph[this.id][sender].linkVisited = true;
-			globalViewer.nodesGraph[sender][this.id].linkVisited = true;
+		if (D) { 
+			log.printf("node %d in directEdge with node %d \n", this.id, sender);
 			
+		}
+		
+		// to eliminate visiting a neigbhor twice. 
+			
+			// setting the link visited state to true. .
+			globalViewer.nodesGraph[this.id][sender].linkVisited = true;
+			// globalViewer.nodesGraph[sender][this.id].linkVisited = true;
+			
+			if (D) { 
+				log.printf("switching the state of (%d,%d) and (%d,%d) to true \n", 
+						this.id, sender, sender, this.id);
+			}
+			
+			
+			// finding shared tags between sender and myself.
 			ArrayList<Integer> sharedTags = MyUtil.interesect(
 				globalViewer.neighborsTagsTable.get(sender), 
 				globalViewer.neighborsTagsTable.get(this.id) ); 
 			
 			
-		
+			if (D) { 
+				log.printf("node %d share %d tags with node %d \n",
+						this.id, sharedTags.size(), sender);
+			}			
+			
+			// check whether the two nodes share at least one tag. 
 			if (sharedTags.size() > 0) { 
-				
-				if (D) { 
-					log.printf("node %d share %d tags with node %d \n",
-							this.id, sharedTags.size(), sender);
-				}
-				
 				globalViewer.nodesGraph[this.id][sender].shareTag = true;
 				globalViewer.nodesGraph[sender][this.id].shareTag = true;
-				
 			}		
 			
+			
+			// if they share a tag then:
 			if (globalViewer.nodesGraph[this.id][sender].shareTag) { 
 		
 				for (int i = 0; i < sharedTags.size(); i++) { 
+					
+					if (D)  {
+						log.printf("node %d testing shared tag %d \n", this.id, sharedTags.get(i));
+					}
 					
 					switch (neighborsTags.get(sharedTags.get(i)).owner) { 
 					case Tag.NOT_INIT: 
@@ -248,7 +340,7 @@ public class RREComNode extends Node {
 						} else { 
 							
 							if (D) { 
-								log.printf("node %d temp owns tag %d \n", 
+								log.printf("node %d temporarily owns tag %d \n", 
 										this.id, sharedTags.get(i));
 							}
 							
@@ -282,10 +374,12 @@ public class RREComNode extends Node {
 			}
 
 		
-		}
+		
 		
 		
 	}
+	
+	
 	
 	
 	private RREComValue getWeight() {
@@ -307,8 +401,13 @@ public class RREComNode extends Node {
 
 	@Override
 	public boolean isTerminatedStatus(String str) {
-		// TODO Auto-generated method stub
-		return false;
+		return (str == RREComNode.STAT_TERMINATE);
+	}
+	
+
+	private void terminate() {
+		
+		changeStatus(RREComNode.STAT_TERMINATE);
 	}
 
 }

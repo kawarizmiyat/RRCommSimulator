@@ -17,10 +17,10 @@ public class Main {
 		
 		
 		ArrayList< ArrayList<Integer> > rtGraph; 
-		rtGraph = GraphExtractor.readFile("graphs/rt_sample_1.dat");
+		rtGraph = GraphExtractor.readFile("graphs/rt_sample_6.dat");
 		
 		ArrayList< ArrayList<Integer> > rrGraph; 
-		rrGraph = GraphExtractor.readFile("graphs/rr_sample_1.dat");
+		rrGraph = GraphExtractor.readFile("graphs/rr_sample_6.dat");
 		
 		RRESimSystem rs = new RRESimSystem(rrGraph, rtGraph);
 		rs.run();

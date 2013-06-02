@@ -189,13 +189,10 @@ public abstract class Node {
 	public boolean isTerminated() {
 		return isTerminatedStatus(status);
 	}
+
+	
 	
 	public boolean ownTag(int tag) {
-		
-		if (D) { 
-			log.printf("reader %d owns tag %d \n", 
-					this.id, tag);
-		}
 		
 		for (int j = 0; j < ownedTags.size(); j++) { 
 			if (ownedTags.get(j) == tag) { 

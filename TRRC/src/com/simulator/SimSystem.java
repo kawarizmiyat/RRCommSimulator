@@ -17,10 +17,10 @@ public abstract class SimSystem  {
 
 	// for keeping statistics
 	private final double END = 20000; // marks the end of the simulation period
-	protected ArrayList<Node> nodesTable;
+	public ArrayList<Node> nodesTable;
 
-	private static final boolean D = false; 
-	private final PrintStream log = System.out; 
+	public static final boolean D = false; 
+	public final PrintStream log = System.out; 
 
 	
 	public SimSystem() { 
@@ -29,10 +29,12 @@ public abstract class SimSystem  {
 	}
 
 
+	
 	protected abstract void setupProtocol(
 			ArrayList<ArrayList<Integer> > rrGraph,
 			ArrayList<ArrayList<Integer> > rtGraph);
-
+	
+	protected abstract void analyzeResults();
 	
 
 
@@ -138,7 +140,7 @@ public abstract class SimSystem  {
 
 
 
-	private void analyzeResults() { }
+
 
 
 
