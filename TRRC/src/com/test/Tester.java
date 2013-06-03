@@ -1,6 +1,6 @@
 package com.test;
 
-import com.protocol.rrecom.DBGraphEntity;
+import com.protocol.directbased.DBGraphEntity;
 
 public class Tester {
 

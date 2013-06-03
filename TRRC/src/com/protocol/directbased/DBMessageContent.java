@@ -1,4 +1,4 @@
-package com.protocol.rrecom;
+package com.protocol.directbased;
 
 public class DBMessageContent {
 

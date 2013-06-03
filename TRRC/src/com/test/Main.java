@@ -3,7 +3,7 @@ package com.test;
 import java.util.ArrayList;
 
 import com.filefunctions.GraphExtractor;
-import com.protocol.rrecom.DirectBasedSimSystem;
+import com.protocol.directbased.DirectBasedSimSystem;
 
 public class Main {
 
