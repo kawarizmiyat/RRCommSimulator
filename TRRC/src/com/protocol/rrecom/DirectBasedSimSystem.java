@@ -5,30 +5,30 @@ import java.util.ArrayList;
 import com.protocol.Node;
 import com.simulator.SimSystem;
 
-public class RRESimSystem extends SimSystem {
+public class DirectBasedSimSystem extends SimSystem {
 
-	RREGlobalStruct globalStruct; 
+	DBGlobalStruct globalStruct; 
 	ArrayList<ArrayList<Integer> > rrGraph, rtGraph; 
 	
 	
-	public RRESimSystem(ArrayList<ArrayList<Integer>> rrGraph,
-			ArrayList<ArrayList<Integer>> rtGraph) { 
+	public DirectBasedSimSystem(ArrayList<ArrayList<Integer>> rrGraph,
+			ArrayList<ArrayList<Integer>> rtGraph, String algorithm) { 
 		
 		
 		super();
 		
 		this.rrGraph = rrGraph; 
 		this.rtGraph = rtGraph; 
-		globalStruct = new RREGlobalStruct(rrGraph.size());
+		globalStruct = new DBGlobalStruct(rrGraph.size());
 		
 		
-		setupProtocol(rrGraph, rtGraph);
+		setupProtocol(rrGraph, rtGraph, algorithm);
 	}
 	
 	
 	@Override
 	protected void setupProtocol(ArrayList<ArrayList<Integer>> rrGraph,
-			ArrayList<ArrayList<Integer>> rtGraph) {
+			ArrayList<ArrayList<Integer>> rtGraph, String alg) {
 		
 		// In RRE: we require a global structure. 
 		// + every node is an initiator. 
@@ -49,7 +49,7 @@ public class RRESimSystem extends SimSystem {
 		// initiate the nodes. 
 		
 		for (int i = 0; i < rrGraph.size(); i++ ) { 
-			nodesTable.add(new RREComNode(this, i, globalStruct));
+			nodesTable.add(new DirectBasedComNode(this, i, globalStruct, alg));
 		}
 
 		// initiate the reader-tag relationship at each node. 

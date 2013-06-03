@@ -1,6 +1,6 @@
 package com.test;
 
-import com.protocol.rrecom.RREGraphEntity;
+import com.protocol.rrecom.DBGraphEntity;
 
 public class Tester {
 
@@ -8,10 +8,10 @@ public class Tester {
 	public Tester() { 
 		
 		int n = 5; 
-		RREGraphEntity[][] arr = new RREGraphEntity[n][n];
+		DBGraphEntity[][] arr = new DBGraphEntity[n][n];
 		for (int i = 0; i < arr.length; i++) { 
 			for (int j = 0; j < arr[i].length; j++) { 
-				arr[i][j] = new RREGraphEntity();
+				arr[i][j] = new DBGraphEntity();
 			}
 		}
 		

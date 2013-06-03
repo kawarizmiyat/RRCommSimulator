@@ -32,7 +32,8 @@ public abstract class SimSystem  {
 	
 	protected abstract void setupProtocol(
 			ArrayList<ArrayList<Integer> > rrGraph,
-			ArrayList<ArrayList<Integer> > rtGraph);
+			ArrayList<ArrayList<Integer> > rtGraph, 
+			String alg);
 	
 	protected abstract void analyzeResults();
 	

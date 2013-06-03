@@ -1,18 +1,18 @@
 package com.protocol.rrecom;
 
-public class RREComValue {
+public class DBComValue {
 
 	
 	
 	protected int weight;
 	protected int id;
 
-	public RREComValue(int weight, int id) {
+	public DBComValue(int weight, int id) {
 		this.weight = weight; 
 		this.id = id;
 	}
 
-	public int compareTo(RREComValue s) {
+	public int compareTo(DBComValue s) {
 		if (this.weight > s.weight) return 1; 
 		if (this.weight == s.weight) { 
 			if (this.id > s.id ) return 1; 
@@ -23,4 +23,12 @@ public class RREComValue {
 		return -1;
 	}
 
+	@Override
+	public String toString() {
+		return "(" + weight + ", " + id + ")";
+	}
+
+	
+	
+	
 }

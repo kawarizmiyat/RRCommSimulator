@@ -1,12 +1,12 @@
 package com.protocol.rrecom;
 
-public class RREGraphEntity {
+public class DBGraphEntity {
 
 	public boolean linkVisited = false;
 	public boolean shareTag = false;
 	public boolean edge = false; 
 	
-	public RREGraphEntity() { 
+	public DBGraphEntity() { 
 		linkVisited = false;
 		shareTag = false;
 		edge = false; 

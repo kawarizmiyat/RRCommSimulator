@@ -3,7 +3,7 @@ package com.test;
 import java.util.ArrayList;
 
 import com.filefunctions.GraphExtractor;
-import com.protocol.rrecom.RRESimSystem;
+import com.protocol.rrecom.DirectBasedSimSystem;
 
 public class Main {
 
@@ -17,12 +17,13 @@ public class Main {
 		
 		
 		ArrayList< ArrayList<Integer> > rtGraph; 
-		rtGraph = GraphExtractor.readFile("graphs/rt_sample_6.dat");
+		rtGraph = GraphExtractor.readFile("graphs/rt_sample_2.dat");
 		
 		ArrayList< ArrayList<Integer> > rrGraph; 
-		rrGraph = GraphExtractor.readFile("graphs/rr_sample_6.dat");
+		rrGraph = GraphExtractor.readFile("graphs/rr_sample_2.dat");
 		
-		RRESimSystem rs = new RRESimSystem(rrGraph, rtGraph);
+		DirectBasedSimSystem rs = new DirectBasedSimSystem(
+				rrGraph, rtGraph, "RANDOM");
 		rs.run();
 		
 		

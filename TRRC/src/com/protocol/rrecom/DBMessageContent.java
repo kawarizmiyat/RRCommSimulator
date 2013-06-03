@@ -1,16 +1,16 @@
 package com.protocol.rrecom;
 
-public class RREComMessageContent {
+public class DBMessageContent {
 
 	
 	public int type;
 	public int weight;
 	
-	public RREComMessageContent(int type) { 
+	public DBMessageContent(int type) { 
 		this.type = type;
 	}
 
-	public RREComMessageContent(int type, int weight) { 
+	public DBMessageContent(int type, int weight) { 
 		this.type = type;
 		this.weight = weight;
 	}

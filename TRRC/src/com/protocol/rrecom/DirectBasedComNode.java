@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import com.my.util.MyUtil;
 import com.protocol.Neighbor;
@@ -16,7 +17,7 @@ import com.protocol.Tag;
 import com.simulator.Message;
 import com.simulator.SimSystem;
 
-public class RREComNode extends Node {
+public class DirectBasedComNode extends Node {
 
 
 	private static final String STAT_INIT = "STAT_INIT";
@@ -30,17 +31,31 @@ public class RREComNode extends Node {
 	private static final int MSG_TYPE_EX_0 = 0;	// in RRE: this is only 
 												// for direction only. 
 
-	
-	
-	private RREComValue myWeight;
+	private String algorithm;
+	private DBComValue myWeight;
 	private final boolean D = true;
-	private RREGlobalStruct globalViewer; 
+	private DBGlobalStruct globalViewer; 
 	
-	public RREComNode(SimSystem sim, int id, RREGlobalStruct g) {
+	public DirectBasedComNode(SimSystem sim, int id, DBGlobalStruct g, String algorithm) {
 		super(sim, id);
 		
-		this.status = RREComNode.STAT_INIT; 
+		setAlgorithm(algorithm);
+		
+		this.status = DirectBasedComNode.STAT_INIT; 
 		this.globalViewer = g;
+	}
+
+	private void setAlgorithm(String alg) {
+		if (alg.equals("RRE") || 
+				alg.equals("DRRE") || 
+				alg.equals("RANDOM")) { 
+			algorithm = alg;
+		} else { 
+			log.printf("unrecognized algorithm \n");
+			abort();
+		}
+		
+		
 	}
 
 	@Override
@@ -49,11 +64,37 @@ public class RREComNode extends Node {
 			log.printf("node %d initiates the algorithm \n", this.id);
 		}
 		
-		myWeight = new RREComValue(this.numNeighborTags, this.id);
+		
+		initMyWeight();
 		startRound();
 	}
 
 
+
+	private void initMyWeight() {
+		
+		boolean innerD = true;
+		
+		if (algorithm.equals("RRE")) { 		
+			myWeight = new DBComValue(this.numNeighborTags, this.id);
+		} else if (algorithm.equals("DRRE")) { 
+			myWeight = new DBComValue(this.numNeighborReaders, this.id);
+		} else if (algorithm.equals("RANDOM")) { 
+			
+			Random r = new Random(); 
+			myWeight = new DBComValue(r.nextInt(), this.id);
+			
+		} else { 
+			
+			log.printf("there must be an error, algorithm is not recognized \n");
+		}
+		
+		
+		if (D && innerD) { 
+			log.printf("*** node %d initialized its weight to %s \n", 
+					this.id, getWeight());
+		}
+	}
 
 	private void startRound() {
 
@@ -64,7 +105,7 @@ public class RREComNode extends Node {
 		
 		
 		// start the sending part of the communication round.
-		changeStatus(RREComNode.STAT_EX_TX); 
+		changeStatus(DirectBasedComNode.STAT_EX_TX); 
 		
 		
 		// iterate over all your neighbros - and send a message msg_ex. 
@@ -76,8 +117,8 @@ public class RREComNode extends Node {
 				Neighbor n = pairs.getValue(); 
 		        if (n.active) { 
 		        	
-					RREComMessageContent mc = prepareMessage(round);
-					Message msg = new Message(this.id, n.id, RREComNode.MSG_EX, mc);
+					DBMessageContent mc = prepareMessage(round);
+					Message msg = new Message(this.id, n.id, DirectBasedComNode.MSG_EX, mc);
 					
 					sendMessage(msg);
 					
@@ -89,15 +130,15 @@ public class RREComNode extends Node {
 		}
 		
 		// start at the receiving part of the communication round.
-		changeStatus(RREComNode.STAT_EX_RX);
+		changeStatus(DirectBasedComNode.STAT_EX_RX);
 
 		
 	}
 
-	private RREComMessageContent prepareMessage(int r) {
+	private DBMessageContent prepareMessage(int r) {
 		
 		if (r == 0) { 
-			return new RREComMessageContent(RREComNode.MSG_TYPE_EX_0, numNeighborTags);
+			return new DBMessageContent(DirectBasedComNode.MSG_TYPE_EX_0, getWeight().weight);
 		} else {
 			return null; 
 		}
@@ -114,10 +155,10 @@ public class RREComNode extends Node {
 			abort();
 		}
 		
-		if (status == RREComNode.STAT_INIT) { 
+		if (status == DirectBasedComNode.STAT_INIT) { 
 			handleStatusInit(message);
 			
-		} else if (status == RREComNode.STAT_EX_RX) { 
+		} else if (status == DirectBasedComNode.STAT_EX_RX) { 
 			handleStatusExRx(message);
 		
 		} else { 
@@ -135,17 +176,17 @@ public class RREComNode extends Node {
 
 	private void handleStatusExRx(Message message) {
 		
-		if (message.msgType == RREComNode.MSG_EX) { 
+		if (message.msgType == DirectBasedComNode.MSG_EX) { 
 			
 			if (D) { 
 				log.printf("node %d received message MSG_EX at status %s \n", this.id, status);
 			}
 			
 			
-			RREComMessageContent rmc =  (RREComMessageContent) message.msgContent; 
+			DBMessageContent rmc =  (DBMessageContent) message.msgContent; 
 
 
-			if (rmc.type == RREComNode.MSG_TYPE_EX_0) { 
+			if (rmc.type == DirectBasedComNode.MSG_TYPE_EX_0) { 
 				
 				if (D) { 
 					log.printf("node %d received msg_type_ex 0 ... \n", this.id);
@@ -239,9 +280,9 @@ public class RREComNode extends Node {
 	private boolean allVisited(int additionalInfo) {
 		
 		
-		if (status == RREComNode.STAT_EX_RX) { 
+		if (status == DirectBasedComNode.STAT_EX_RX) { 
 		
-			RREGraphEntity[] t = globalViewer.nodesGraph[this.id];
+			DBGraphEntity[] t = globalViewer.nodesGraph[this.id];
 		
 			for (int i = 0; i < t.length; i++) { 
 				
@@ -283,8 +324,8 @@ public class RREComNode extends Node {
 		
 		
 		int sender = message.senderId;
-		int senderWeight = ((RREComMessageContent) message.msgContent).weight;
-		RREComValue sw = new RREComValue(senderWeight, sender);
+		int senderWeight = ((DBMessageContent) message.msgContent).weight;
+		DBComValue sw = new DBComValue(senderWeight, sender);
 		
 		
 		if (D) { 
@@ -382,7 +423,7 @@ public class RREComNode extends Node {
 	
 	
 	
-	private RREComValue getWeight() {
+	private DBComValue getWeight() {
 		return myWeight;
 	}
 	
@@ -393,21 +434,21 @@ public class RREComNode extends Node {
 
 	@Override
 	public boolean isValidStatus(String str) {
-		return (str == RREComNode.STAT_INIT || 
-				str == RREComNode.STAT_TERMINATE || 
-				str == RREComNode.STAT_EX_RX || 
-				str == RREComNode.STAT_EX_TX); 
+		return (str == DirectBasedComNode.STAT_INIT || 
+				str == DirectBasedComNode.STAT_TERMINATE || 
+				str == DirectBasedComNode.STAT_EX_RX || 
+				str == DirectBasedComNode.STAT_EX_TX); 
 	}
 
 	@Override
 	public boolean isTerminatedStatus(String str) {
-		return (str == RREComNode.STAT_TERMINATE);
+		return (str == DirectBasedComNode.STAT_TERMINATE);
 	}
 	
 
 	private void terminate() {
 		
-		changeStatus(RREComNode.STAT_TERMINATE);
+		changeStatus(DirectBasedComNode.STAT_TERMINATE);
 	}
 
 }

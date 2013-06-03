@@ -3,6 +3,7 @@ package com.protocol;
 public class Tag {
 
 	public int id, owner; 
+	public boolean active;
 	
 	public static final int NOT_INIT = -1; 
 	public static final int NOT_ME = 0; 
@@ -10,7 +11,8 @@ public class Tag {
 	
 	public Tag(int id) { 
 		this.id = id;
-		this.owner = -1;
+		this.owner = Tag.NOT_INIT;
+		this.active = true;
 	}
 	
 }
