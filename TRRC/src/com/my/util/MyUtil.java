@@ -111,6 +111,26 @@ public class MyUtil {
 		return str; 
 	}
 
+	// TODO: test me ! 
+	public static boolean removeFromList(ArrayList<Integer> list, Integer element) { 
+		int index = -1; 
+		for (int i = 0; i < list.size(); i++) { 
+			if (list.get(i) == element) { 
+				index = i; 
+				break;
+			}
+		}
+		
+		// element does not exists
+		if (index == -1) { 
+			return false; 
+		} else { 
+			list.remove(index);
+			return true;
+		}
+		
+	}
+	
 	
 	
 }
