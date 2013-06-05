@@ -66,7 +66,7 @@ public class ColorBasedSimSystem extends SimSystem {
 				for (int j = 0; j < n.ownedTags.size(); j++)  {
 					log.printf("%d ", n.ownedTags.get(j));
 				}
-				log.printf("); \n");
+				log.printf(") color: %d; \n", nodesTable.get(i).color);
 			}
 		}
 	}

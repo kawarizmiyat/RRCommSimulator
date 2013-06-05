@@ -19,7 +19,7 @@ public abstract class Node {
 	
 	public int numNeighborTags; 
 	public int numNeighborReaders;
-	public int round;
+	public int round, color; 
 	
 	public boolean redundant = false;
 	
@@ -161,10 +161,6 @@ public abstract class Node {
 	}
 	
 	protected void changeStatus(String str) {
-		
-		if (D) { 
-			log.printf("at change status to %s \n", str);
-		}
 		
 		if (isValidStatus(str)) { 
 			

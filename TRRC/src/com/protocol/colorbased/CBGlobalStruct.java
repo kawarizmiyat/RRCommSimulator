@@ -13,6 +13,10 @@ public class CBGlobalStruct {
 		nodesGraph = new boolean[numNodes][numNodes]; 
 		graphList = new ArrayList<NeighborLists>();
 		
+		for (int i = 0; i < numNodes; i++) { 
+			graphList.add(new NeighborLists());
+		}
+		
 	}
 
 	public void setNeighborReaders(ArrayList<ArrayList<Integer>> rrGraph) { 
@@ -24,8 +28,8 @@ public class CBGlobalStruct {
 
 	public void setNeighborTags(ArrayList<ArrayList<Integer>> rtGraph) { 
 		for (int i = 0; i < rtGraph.size(); i++) { 
-			graphList.get(i).neighborNodes.addAll(rtGraph.get(i));
-			graphList.get(i).activeNeighborNodes.addAll(rtGraph.get(i));
+			graphList.get(i).neighborTags.addAll(rtGraph.get(i));
+			graphList.get(i).activeNeighborTags.addAll(rtGraph.get(i));
 		}		
 	}
 	

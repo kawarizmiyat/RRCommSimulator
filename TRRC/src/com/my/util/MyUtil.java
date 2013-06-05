@@ -6,7 +6,7 @@ public class MyUtil {
 
 	
 
-	public  static ArrayList<Integer> interesect(ArrayList<Integer> f, ArrayList<Integer> s) { 
+	public  static ArrayList<Integer> intersect(ArrayList<Integer> f, ArrayList<Integer> s) { 
 		ArrayList<Integer> res = new ArrayList<Integer>();
 		
 		int i = 0, j = 0; 
@@ -112,7 +112,7 @@ public class MyUtil {
 	}
 
 	// TODO: test me ! 
-	public static boolean removeFromList(ArrayList<Integer> list, Integer element) { 
+	public static boolean removeFromList(ArrayList<Integer> list, int element) { 
 		int index = -1; 
 		for (int i = 0; i < list.size(); i++) { 
 			if (list.get(i) == element) { 

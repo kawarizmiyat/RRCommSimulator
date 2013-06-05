@@ -346,7 +346,7 @@ public class DirectBasedComNode extends Node {
 			
 			
 			// finding shared tags between sender and myself.
-			ArrayList<Integer> sharedTags = MyUtil.interesect(
+			ArrayList<Integer> sharedTags = MyUtil.intersect(
 				globalViewer.neighborsTagsTable.get(sender), 
 				globalViewer.neighborsTagsTable.get(this.id) ); 
 			
